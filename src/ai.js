@@ -55,16 +55,13 @@
 // =================================================================================================================
 
 // src/ai.js
-export async function getRecipeFromGemini(ingredientsArr, refinement = "", currentRecipe = null) {
+export async function getRecipeFromGemini(ingredientsArr, refinement = "", currentRecipe = null, signal) {
   try {
     const response = await fetch('/api/generate-recipe', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        ingredients: ingredientsArr, 
-        refinement, 
-        currentRecipe 
-      })
+      body: JSON.stringify({ ingredients: ingredientsArr, refinement, currentRecipe }),
+      signal // Pass the abort signal here
     });
 
     const data = await response.json();
