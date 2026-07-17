@@ -1,0 +1,161 @@
+import React, { useState } from "react";
+import { motion } from 'framer-motion';
+
+export default function RecipeDisplay({ recipe, onRefine, isRefining, onRegenerate, onReset }) {
+  const [checkedSteps, setCheckedSteps] = useState({});
+  const [checkedIngredients, setCheckedIngredients] = useState({});
+  const [refinementText, setRefinementText] = useState("");
+
+  if (!recipe) return null;
+
+  const toggleStep = (idx) => setCheckedSteps(p => ({...p, [idx]: !p[idx]}));
+  const toggleIng = (idx) => setCheckedIngredients(p => ({...p, [idx]: !p[idx]}));
+
+  const handleRefineSubmit = (e, text) => {
+    e.preventDefault();
+    onRefine(text, recipe);
+    setRefinementText("");
+  };
+
+  const totalSteps = recipe.steps?.length || 1;
+  const completedSteps = Object.values(checkedSteps).filter(Boolean).length;
+  const progress = (completedSteps / totalSteps) * 100;
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      className="p-10 rounded-3xl shadow-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl"
+    >
+      {/* Sticky Progress Bar */}
+      <div className="fixed top-0 left-0 w-full h-[3px] z-50 bg-black/50">
+        <motion.div 
+          className="h-full bg-gradient-to-r from-orange-500 to-yellow-400" 
+          animate={{ width: `${progress}%` }}
+          transition={{ stiffness: 300 }}
+        />
+      </div>
+
+      {/* Header Section */}
+      <div className="mb-10 border-b border-white/10 pb-8">
+        <h2 className="font-serif text-4xl md:text-5xl text-white mb-3 tracking-tight">{recipe.title}</h2>
+        <p className="italic text-zinc-400 text-lg font-light max-w-2xl">{recipe.description}</p>
+      </div>
+
+      {/* Servings Scaler */}
+      <div className="flex items-center gap-6 mb-10">
+        <span className="text-xs uppercase tracking-widest text-zinc-500">Servings</span>
+        <div className="flex items-center gap-3">
+          <button 
+            disabled={isRefining}
+            onClick={() => onRefine(`Scale this recipe to ${Math.max(1, recipe.servings - 1)} servings`, recipe)}
+            className="w-9 h-9 rounded-full bg-white/5 border border-white/10 text-white font-light text-xl hover:bg-orange-500 hover:border-orange-500 transition-colors flex items-center justify-center disabled:opacity-30"
+          >-</button>
+          <span className="font-serif text-xl text-white w-6 text-center">{recipe.servings || 4}</span>
+          <button 
+            disabled={isRefining}
+            onClick={() => onRefine(`Scale this recipe to ${recipe.servings + 1} servings`, recipe)}
+            className="w-9 h-9 rounded-full bg-white/5 border border-white/10 text-white font-light text-xl hover:bg-orange-500 hover:border-orange-500 transition-colors flex items-center justify-center disabled:opacity-30"
+          >+</button>
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-12">
+        {/* Ingredients Column */}
+        <div>
+          <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-orange-500 mb-6">Ingredients</h3>
+          <ul className="space-y-3">
+            {recipe.ingredients?.map((ing, idx) => (
+              <motion.li 
+                key={idx} 
+                layout
+                onClick={() => toggleIng(idx)}
+                className={`flex items-center justify-between gap-3 cursor-pointer p-2 rounded-lg transition-all ${checkedIngredients[idx] ? 'opacity-40' : 'hover:bg-white/5'}`}
+              >
+                <div className="flex items-center gap-3">
+                  <span className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors ${checkedIngredients[idx] ? 'bg-orange-500 border-orange-500' : 'border-zinc-600'}`}>
+                    {checkedIngredients[idx] && <span className="text-white text-[10px]">✓</span>}
+                  </span>
+                  <span className="text-zinc-200 font-light">{ing}</span>
+                </div>
+                <button 
+                  onClick={(e) => { e.stopPropagation(); onRefine(`Swap out ${ing} for a common alternative`, recipe); }}
+                  disabled={isRefining}
+                  className="text-[10px] px-2 py-1 rounded-full bg-white/5 border border-white/10 text-zinc-400 hover:bg-orange-500 hover:text-white hover:border-orange-500 disabled:opacity-50 transition-colors uppercase tracking-wider"
+                >
+                  Swap
+                </button>
+              </motion.li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Instructions Column */}
+        <div>
+          <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-orange-500 mb-6">Method</h3>
+          <ol className="space-y-6">
+            {recipe.steps?.map((step, idx) => (
+              <motion.li 
+                key={idx} 
+                layout
+                onClick={() => toggleStep(idx)}
+                className={`flex gap-5 cursor-pointer group transition-all ${checkedSteps[idx] ? 'opacity-50' : ''}`}
+              >
+                {/* Custom Number/Checkbox Hybrid */}
+                <div className={`flex-shrink-0 w-8 h-8 rounded-full border-2 flex items-center justify-center font-serif text-sm transition-all ${checkedSteps[idx] ? 'bg-green-500 border-green-500 text-white' : 'border-zinc-600 text-zinc-400 group-hover:border-orange-500 group-hover:text-orange-500'}`}>
+                  {checkedSteps[idx] ? '✓' : idx + 1}
+                </div>
+                <div className="pt-1">
+                  <span className={`text-zinc-200 font-light leading-relaxed ${checkedSteps[idx] ? 'line-through' : ''}`}>{step}</span>
+                  {/* Affordance text to tell user to click */}
+                  {!checkedSteps[idx] && <div className="text-[10px] text-zinc-600 uppercase tracking-wider mt-1 opacity-0 group-hover:opacity-100 transition-opacity">Click to complete</div>}
+                </div>
+              </motion.li>
+            ))}
+          </ol>
+        </div>
+      </div>
+
+      {/* Chef's Tips */}
+      {recipe.tips && recipe.tips.length > 0 && (
+        <div className="mt-12 p-6 rounded-2xl border-l-2 border-orange-500 bg-orange-500/5">
+          <h4 className="font-serif text-lg text-orange-500 mb-3">Chef's Secrets</h4>
+          <ul className="space-y-2 text-sm">
+            {recipe.tips.map((tip, idx) => <li key={idx} className="text-zinc-300 font-light italic">— {tip}</li>)}
+          </ul>
+        </div>
+      )}
+
+      {/* Custom Refinement Input */}
+      <form onSubmit={(e) => handleRefineSubmit(e, refinementText)} className="mt-10">
+        <label className="text-xs uppercase tracking-widest text-zinc-500 block mb-3">Refine Recipe</label>
+        <input 
+          type="text"
+          value={refinementText}
+          onChange={(e) => setRefinementText(e.target.value)}
+          placeholder="e.g., 'Make it spicier' or 'Add garlic'"
+          className="w-full px-5 py-4 rounded-xl border border-white/10 bg-black/40 text-white placeholder-zinc-600 outline-none focus:border-orange-500 transition-colors font-light"
+          disabled={isRefining}
+        />
+      </form>
+
+      {/* Bottom Actions: Start Over & Next Recipe */}
+      <div className="mt-12 pt-8 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <button 
+          onClick={onReset}
+          className="text-xs uppercase tracking-widest text-zinc-500 hover:text-white transition-colors"
+        >
+          ↺ Start Over
+        </button>
+        <button 
+          onClick={onRegenerate}
+          disabled={isRefining}
+          className="px-8 py-3 rounded-full border border-white/20 text-white text-xs uppercase tracking-widest hover:bg-white hover:text-black hover:border-white transition-all disabled:opacity-50"
+        >
+          ✦ Next Recipe
+        </button>
+      </div>
+    </motion.div>
+  );
+}
