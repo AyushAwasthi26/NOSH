@@ -171,7 +171,7 @@ export default function Body({ darkMode }) {
             onRefine={(text, currentRecipe) => fetchRecipe(text, currentRecipe)} 
             isRefining={isRefining}
             onReset={resetIngredients}
-            // onRegenerate={() => fetchRecipe()} 
+            onRegenerate={() => fetchRecipe()} 
           />
         )}
       </section>

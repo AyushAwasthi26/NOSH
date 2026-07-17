@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion } from 'framer-motion';
 
-export default function RecipeDisplay({ recipe, darkMode, onRefine, isRefining, onReset }) {
+export default function RecipeDisplay({ recipe, darkMode, onRefine, isRefining, onRegenerate, onReset }) {
   const [checkedSteps, setCheckedSteps] = useState({});
   const [checkedIngredients, setCheckedIngredients] = useState({});
   const [refinementText, setRefinementText] = useState("");
@@ -13,6 +13,7 @@ export default function RecipeDisplay({ recipe, darkMode, onRefine, isRefining, 
 
   const handleRefineSubmit = (e, text) => {
     e.preventDefault();
+    if (!text.trim()) return; // Don't submit if empty
     onRefine(text, recipe);
     setRefinementText("");
   };
@@ -146,26 +147,42 @@ export default function RecipeDisplay({ recipe, darkMode, onRefine, isRefining, 
         </div>
       )}
 
-      {/* Custom Refinement Input */}
+      {/* Custom Refinement Input - WITH BUTTON */}
       <form onSubmit={(e) => handleRefineSubmit(e, refinementText)} className="mt-10">
         <label className={`text-xs uppercase tracking-widest block mb-3 ${subText}`}>Refine Recipe</label>
-        <input 
-          type="text"
-          value={refinementText}
-          onChange={(e) => setRefinementText(e.target.value)}
-          placeholder="e.g., 'Make it spicier' or 'Add garlic'"
-          className={`w-full px-5 py-4 rounded-xl border outline-none focus:border-orange-500 transition-colors font-light ${inputBg}`}
-          disabled={isRefining}
-        />
+        <div className="flex gap-3">
+          <input 
+            type="text"
+            value={refinementText}
+            onChange={(e) => setRefinementText(e.target.value)}
+            placeholder="e.g., 'Make it spicier' or 'Add garlic'"
+            className={`flex-1 px-5 py-4 rounded-xl border outline-none focus:border-orange-500 transition-colors font-light ${inputBg}`}
+            disabled={isRefining}
+          />
+          <button 
+            type="submit"
+            disabled={isRefining || refinementText.trim() === ''}
+            className={`px-6 py-4 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 ${isRefining || refinementText.trim() === '' ? 'bg-zinc-500/20 text-zinc-500 cursor-not-allowed' : 'bg-orange-500 text-white hover:bg-orange-600'}`}
+          >
+            {isRefining ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : "Refine"}
+          </button>
+        </div>
       </form>
 
-      {/* Bottom Action: Start Over Only */}
-      <div className={`mt-12 pt-8 border-t ${divider} flex justify-center items-center`}>
+      {/* Bottom Actions: Restored Start Over & Next Recipe */}
+      <div className={`mt-12 pt-8 border-t ${divider} flex flex-col sm:flex-row justify-between items-center gap-4`}>
         <button 
           onClick={onReset}
-          className={`px-8 py-3 rounded-full border border-orange-500 text-orange-500 text-xs uppercase tracking-widest hover:bg-orange-500 hover:text-white transition-all`}
+          className={`text-xs uppercase tracking-widest transition-colors ${darkMode ? 'text-zinc-500 hover:text-white' : 'text-zinc-500 hover:text-black'}`}
         >
           ↺ Start Over
+        </button>
+        <button 
+          onClick={onRegenerate}
+          disabled={isRefining}
+          className="px-8 py-3 rounded-full border border-orange-500 text-orange-500 text-xs uppercase tracking-widest hover:bg-orange-500 hover:text-white transition-all disabled:opacity-50"
+        >
+          ✦ Next Recipe
         </button>
       </div>
     </motion.div>
