@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion } from 'framer-motion';
 
-export default function RecipeDisplay({ recipe, darkMode, onRefine, isRefining, onRegenerate, onReset }) {
+export default function RecipeDisplay({ recipe, darkMode, onRefine, isRefining, onReset }) {
   const [checkedSteps, setCheckedSteps] = useState({});
   const [checkedIngredients, setCheckedIngredients] = useState({});
   const [refinementText, setRefinementText] = useState("");
@@ -21,7 +21,6 @@ export default function RecipeDisplay({ recipe, darkMode, onRefine, isRefining, 
   const completedSteps = Object.values(checkedSteps).filter(Boolean).length;
   const progress = (completedSteps / totalSteps) * 100;
 
-  // Dynamic classes based on darkMode
   const glassCard = darkMode 
     ? 'border-white/10 bg-white/[0.03] backdrop-blur-xl' 
     : 'border-black/10 bg-white/60 backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.05)]';
@@ -55,21 +54,25 @@ export default function RecipeDisplay({ recipe, darkMode, onRefine, isRefining, 
         <p className={`italic text-lg font-light max-w-2xl ${subText}`}>{recipe.description}</p>
       </div>
 
-      {/* Servings Scaler */}
+      {/* Servings Scaler with Loading Spinners */}
       <div className="flex items-center gap-6 mb-10">
         <span className={`text-xs uppercase tracking-widest ${subText}`}>Servings</span>
         <div className="flex items-center gap-3">
           <button 
             disabled={isRefining}
             onClick={() => onRefine(`Scale this recipe to ${Math.max(1, recipe.servings - 1)} servings`, recipe)}
-            className={`w-9 h-9 rounded-full border font-light text-xl transition-colors flex items-center justify-center disabled:opacity-30 ${darkMode ? 'bg-white/5 border-white/10 text-white hover:bg-orange-500 hover:border-orange-500' : 'bg-white border-black/10 text-black hover:bg-orange-500 hover:text-white hover:border-orange-500'}`}
-          >-</button>
+            className={`w-9 h-9 rounded-full border font-light text-xl transition-colors flex items-center justify-center disabled:opacity-50 ${darkMode ? 'bg-white/5 border-white/10 text-white hover:bg-orange-500 hover:border-orange-500' : 'bg-white border-black/10 text-black hover:bg-orange-500 hover:text-white hover:border-orange-500'}`}
+          >
+            {isRefining ? <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"></div> : "-"}
+          </button>
           <span className={`font-serif text-xl w-6 text-center ${mainText}`}>{recipe.servings || 4}</span>
           <button 
             disabled={isRefining}
             onClick={() => onRefine(`Scale this recipe to ${recipe.servings + 1} servings`, recipe)}
-            className={`w-9 h-9 rounded-full border font-light text-xl transition-colors flex items-center justify-center disabled:opacity-30 ${darkMode ? 'bg-white/5 border-white/10 text-white hover:bg-orange-500 hover:border-orange-500' : 'bg-white border-black/10 text-black hover:bg-orange-500 hover:text-white hover:border-orange-500'}`}
-          >+</button>
+            className={`w-9 h-9 rounded-full border font-light text-xl transition-colors flex items-center justify-center disabled:opacity-50 ${darkMode ? 'bg-white/5 border-white/10 text-white hover:bg-orange-500 hover:border-orange-500' : 'bg-white border-black/10 text-black hover:bg-orange-500 hover:text-white hover:border-orange-500'}`}
+          >
+            {isRefining ? <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"></div> : "+"}
+          </button>
         </div>
       </div>
 
@@ -89,7 +92,6 @@ export default function RecipeDisplay({ recipe, darkMode, onRefine, isRefining, 
                   <span className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors ${checkedIngredients[idx] ? 'bg-orange-500 border-orange-500' : darkMode ? 'border-zinc-600' : 'border-zinc-300'}`}>
                     {checkedIngredients[idx] && <span className="text-white text-[10px]">✓</span>}
                   </span>
-                  {/* Render rich ingredient object */}
                   <span className={`font-light ${darkMode ? 'text-zinc-200' : 'text-zinc-800'}`}>
                     {ing.quantity && <span className="text-orange-500 mr-1">{ing.quantity}</span>}
                     {ing.name}
@@ -98,16 +100,16 @@ export default function RecipeDisplay({ recipe, darkMode, onRefine, isRefining, 
                 <button 
                   onClick={(e) => { e.stopPropagation(); onRefine(`Swap out ${ing.name} for a common alternative`, recipe); }}
                   disabled={isRefining}
-                  className="text-[10px] px-2 py-1 rounded-full bg-white/5 border border-white/10 text-zinc-400 hover:bg-orange-500 hover:text-white hover:border-orange-500 disabled:opacity-50 transition-colors uppercase tracking-wider"
+                  className="text-[10px] px-2 py-1 rounded-full bg-white/5 border border-white/10 text-zinc-400 hover:bg-orange-500 hover:text-white hover:border-orange-500 disabled:opacity-50 transition-colors uppercase tracking-wider flex items-center justify-center w-[50px] h-[24px]"
                 >
-                  Swap
+                  {isRefining ? <div className="w-2 h-2 border-2 border-current border-t-transparent rounded-full animate-spin"></div> : "Swap"}
                 </button>
               </motion.li>
             ))}
           </ul>
         </div>
 
-        {/* Instructions Column */}
+        {/* Instructions Column - Fixed Number Alignment */}
         <div>
           <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-orange-500 mb-6">Method</h3>
           <ol className="space-y-6">
@@ -118,11 +120,11 @@ export default function RecipeDisplay({ recipe, darkMode, onRefine, isRefining, 
                 onClick={() => toggleStep(idx)}
                 className={`flex gap-5 cursor-pointer group transition-all ${checkedSteps[idx] ? 'opacity-50' : ''}`}
               >
-                <div className={`flex-shrink-0 w-8 h-8 rounded-full border-2 flex items-center justify-center font-serif text-sm transition-all ${checkedSteps[idx] ? 'bg-green-500 border-green-500 text-white' : darkMode ? 'border-zinc-600 text-zinc-400 group-hover:border-orange-500 group-hover:text-orange-500' : 'border-zinc-300 text-zinc-400 group-hover:border-orange-500 group-hover:text-orange-500'}`}>
+                {/* Added leading-none and pb-0.5 for perfect centering */}
+                <div className={`flex-shrink-0 w-8 h-8 rounded-full border-2 flex items-center justify-center font-serif text-sm leading-none pb-0.5 transition-all ${checkedSteps[idx] ? 'bg-green-500 border-green-500 text-white' : darkMode ? 'border-zinc-600 text-zinc-400 group-hover:border-orange-500 group-hover:text-orange-500' : 'border-zinc-300 text-zinc-400 group-hover:border-orange-500 group-hover:text-orange-500'}`}>
                   {checkedSteps[idx] ? '✓' : idx + 1}
                 </div>
                 <div className="pt-1 flex-1">
-                  {/* Render rich step object */}
                   {step.title && <span className={`block font-medium text-sm mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>{step.title}</span>}
                   <span className={`font-light leading-relaxed ${checkedSteps[idx] ? 'line-through' : ''} ${darkMode ? 'text-zinc-200' : 'text-zinc-800'}`}>{step.description || step}</span>
                   {step.tip && <span className="block text-xs italic text-orange-500/80 mt-2">💡 {step.tip}</span>}
@@ -157,20 +159,13 @@ export default function RecipeDisplay({ recipe, darkMode, onRefine, isRefining, 
         />
       </form>
 
-      {/* Bottom Actions */}
-      <div className={`mt-12 pt-8 border-t ${divider} flex flex-col sm:flex-row justify-between items-center gap-4`}>
+      {/* Bottom Action: Start Over Only */}
+      <div className={`mt-12 pt-8 border-t ${divider} flex justify-center items-center`}>
         <button 
           onClick={onReset}
-          className={`text-xs uppercase tracking-widest transition-colors ${darkMode ? 'text-zinc-500 hover:text-white' : 'text-zinc-500 hover:text-black'}`}
+          className={`px-8 py-3 rounded-full border border-orange-500 text-orange-500 text-xs uppercase tracking-widest hover:bg-orange-500 hover:text-white transition-all`}
         >
           ↺ Start Over
-        </button>
-        <button 
-          onClick={onRegenerate}
-          disabled={isRefining}
-          className="px-8 py-3 rounded-full border border-orange-500 text-orange-500 text-xs uppercase tracking-widest hover:bg-orange-500 hover:text-white transition-all disabled:opacity-50"
-        >
-          ✦ Next Recipe
         </button>
       </div>
     </motion.div>
