@@ -1,7 +1,7 @@
 import React from "react";
 import { motion, AnimatePresence } from 'framer-motion';
 
-export default function IngredientsList({ ingredients, darkMode, resetIngredients, toggleRecipeShown, deleteIngredient }) {
+export default function IngredientsList({ ingredients, darkMode, isLoading, resetIngredients, toggleRecipeShown, deleteIngredient }) {
   return (
     <section className="mt-12">
       <AnimatePresence>
@@ -25,7 +25,6 @@ export default function IngredientsList({ ingredients, darkMode, resetIngredient
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.8 }}
                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                    // Dynamic Pill Styling
                     className={`flex items-center gap-3 pl-5 pr-2 py-2 rounded-full text-sm font-light border shadow-sm ${darkMode ? 'bg-white/5 text-white border-white/10' : 'bg-white text-black border-black/10'}`}
                   >
                     {ingredient}
@@ -59,12 +58,20 @@ export default function IngredientsList({ ingredients, darkMode, resetIngredient
             Shall we begin the culinary journey?
           </p>
           <motion.button 
-            whileHover={{ scale: 1.02, boxShadow: "0 0 40px rgba(242, 148, 26, 0.4)" }}
+            whileHover={{ scale: isLoading ? 1 : 1.02, boxShadow: isLoading ? "none" : "0 0 40px rgba(242, 148, 26, 0.4)" }}
             whileTap={{ scale: 0.98 }}
-            onClick={toggleRecipeShown} 
-            className="px-12 py-4 rounded-full bg-gradient-to-r from-orange-600 to-orange-500 text-white font-medium tracking-wider uppercase text-sm shadow-xl shadow-orange-500/20 border border-orange-400/20"
+            onClick={toggleRecipeShown}
+            disabled={isLoading} // Prevents double clicking
+            className={`px-12 py-4 rounded-full bg-gradient-to-r from-orange-600 to-orange-500 text-white font-medium tracking-wider uppercase text-sm shadow-xl shadow-orange-500/20 border border-orange-400/20 flex items-center gap-3 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
-            Generate Recipe
+            {isLoading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                Crafting...
+              </>
+            ) : (
+              "Generate Recipe"
+            )}
           </motion.button>
         </motion.div>
       )}

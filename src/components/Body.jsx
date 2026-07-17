@@ -29,11 +29,16 @@ export default function Body({ darkMode }) {
     else localStorage.removeItem("recipe");
   }, [recipe]);
 
+  // FIX: Scroll down immediately when 'recipeShown' is true (even if loading)
   useEffect(() => {
-    if (recipe && recipeSection.current) {
-      recipeSection.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (recipeShown && recipeSection.current) {
+      // Small timeout ensures the DOM has painted the loading spinner before scrolling
+      const timer = setTimeout(() => {
+        recipeSection.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 50);
+      return () => clearTimeout(timer);
     }
-  }, [recipe]);
+  }, [recipeShown, recipe]);
 
   function deleteIngredient(ingredientToDelete) {
     setIngredients(prev => prev.filter(i => i !== ingredientToDelete));
@@ -105,7 +110,6 @@ export default function Body({ darkMode }) {
             placeholder="e.g. paneer, tomatoes, garlic"
             aria-label="Add ingredient"
             name="ingredient"
-            // Dynamic Input Styling
             className={`flex-1 px-6 py-4 rounded-full border backdrop-blur-md outline-none focus:border-orange-500/50 transition-all shadow-[0_0_30px_rgba(242,148,26,0.15)] font-light ${darkMode ? 'bg-white/5 border-white/10 text-white placeholder-zinc-600' : 'bg-white/60 border-black/10 text-black placeholder-zinc-400'}`}
           />
           <motion.button 
@@ -120,7 +124,8 @@ export default function Body({ darkMode }) {
       
       <IngredientsList
         ingredients={ingredients}
-        darkMode={darkMode} // Passed down
+        darkMode={darkMode}
+        isLoading={isLoading} // Pass loading state down
         resetIngredients={resetIngredients}
         toggleRecipeShown={() => fetchRecipe()}
         deleteIngredient={deleteIngredient}
@@ -151,7 +156,7 @@ export default function Body({ darkMode }) {
         {!isLoading && !error && recipe && (
           <RecipeDisplay 
             recipe={recipe} 
-            darkMode={darkMode} // Passed down
+            darkMode={darkMode}
             onRefine={(text, currentRecipe) => fetchRecipe(text, currentRecipe)} 
             isRefining={isRefining}
             onReset={resetIngredients}
