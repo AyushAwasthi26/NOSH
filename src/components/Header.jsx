@@ -35,7 +35,7 @@ export default function Header({ darkMode, setDarkMode }) {
         {/* Dark/Light Toggle Switch */}
         <div className="flex items-center gap-4">
           <span className={`text-xs uppercase tracking-widest hidden sm:block transition-colors duration-500 ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
-            {darkMode ? 'Cinematic' : 'Light'}
+            {darkMode ? '' : ''}
           </span>
           
           {/* Added whileTap for a smooth click animation */}
