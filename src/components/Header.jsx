@@ -12,7 +12,11 @@ export default function Header({ darkMode, setDarkMode }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <span className="text-3xl text-orange-500">✦</span>
+          {/* <span className="text-3xl text-orange-500">✦</span> */}
+
+          {/* Replaced the span with your nosh.png image */}
+          <img src="/nosh.png" alt="NOSH Logo" className="w-8 h-8 object-contain" />
+
           {/* NOSH in Serif with wide tracking for premium look */}
           <h1 className={`font-serif text-xl tracking-[0.3em] uppercase ${darkMode ? 'text-white' : 'text-black'}`}>
             Nosh
