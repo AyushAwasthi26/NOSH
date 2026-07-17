@@ -48,20 +48,29 @@ export default function IngredientsList({ ingredients, darkMode, isLoading, rese
         )}
       </AnimatePresence>
 
-      {ingredients.length > 3 && (
+      {/* Show Generate Button as soon as 1 ingredient is added */}
+      {ingredients.length > 0 && (
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col items-center"
         >
-          <p className={`font-serif italic mb-6 text-lg ${darkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
+          <p className={`font-serif italic mb-2 text-lg ${darkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
             Shall we begin the culinary journey?
           </p>
+          
+          {/* Mini text indicator if less than 4 ingredients */}
+          {ingredients.length < 4 && (
+            <p className="text-xs text-orange-500/80 mb-6 uppercase tracking-widest text-center">
+              * Add at least 4 ingredients for the best results
+            </p>
+          )}
+
           <motion.button 
             whileHover={{ scale: isLoading ? 1 : 1.02, boxShadow: isLoading ? "none" : "0 0 40px rgba(242, 148, 26, 0.4)" }}
             whileTap={{ scale: 0.98 }}
             onClick={toggleRecipeShown}
-            disabled={isLoading} // Prevents double clicking
+            disabled={isLoading}
             className={`px-12 py-4 rounded-full bg-gradient-to-r from-orange-600 to-orange-500 text-white font-medium tracking-wider uppercase text-sm shadow-xl shadow-orange-500/20 border border-orange-400/20 flex items-center gap-3 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
             {isLoading ? (
