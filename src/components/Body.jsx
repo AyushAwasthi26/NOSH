@@ -112,7 +112,7 @@ export default function Body({ darkMode }) {
           What's in your <span className="italic text-orange-500">kitchen</span>?
         </motion.h2>
         <p className={`font-light mb-10 max-w-xl mx-auto ${darkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>
-          List your ingredients below. Let NOSH craft a cinematic culinary experience for you.
+          List your ingredients below. Let NOSH craft a culinary experience for you.
         </p>
 
         <form onSubmit={handleSubmit} className="flex gap-3 max-w-2xl mx-auto">
