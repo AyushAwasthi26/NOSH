@@ -55,13 +55,18 @@
 // =================================================================================================================
 
 // src/ai.js
+// src/ai.js
 export async function getRecipeFromGemini(ingredientsArr, refinement = "", currentRecipe = null, signal) {
   try {
     const response = await fetch('/api/generate-recipe', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ingredients: ingredientsArr, refinement, currentRecipe }),
-      signal // Pass the abort signal here
+      body: JSON.stringify({ 
+        ingredients: ingredientsArr, 
+        refinement, 
+        currentRecipe 
+      }),
+      signal: signal // <--- THIS IS CRUCIAL! It connects the abort to the fetch
     });
 
     const data = await response.json();
@@ -70,9 +75,9 @@ export async function getRecipeFromGemini(ingredientsArr, refinement = "", curre
       throw new Error(data.error || "Failed to fetch recipe.");
     }
 
-    return data; // The backend already parses and validates the JSON!
+    return data;
   } catch (err) {
-    console.error("API Route Error:", err);
-    throw new Error(err.message || "Failed to fetch recipe.");
+    // Re-throw the error so the component can check if it was aborted
+    throw err;
   }
 }

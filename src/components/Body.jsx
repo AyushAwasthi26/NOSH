@@ -19,6 +19,9 @@ export default function Body({ darkMode }) {
   const [isRefining, setIsRefining] = useState(false); 
   const [error, setError] = useState(null);
   const recipeSection = useRef(null);
+  
+  // NEW: Ref to hold the AbortController across re-renders
+  const abortControllerRef = useRef(null);
 
   useEffect(() => {
     localStorage.setItem("ingredients", JSON.stringify(ingredients));
@@ -32,7 +35,6 @@ export default function Body({ darkMode }) {
   // FIX: Scroll down immediately when 'recipeShown' is true (even if loading)
   useEffect(() => {
     if (recipeShown && recipeSection.current) {
-      // Small timeout ensures the DOM has painted the loading spinner before scrolling
       const timer = setTimeout(() => {
         recipeSection.current.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 50);
@@ -53,16 +55,25 @@ export default function Body({ darkMode }) {
     localStorage.removeItem("recipe");
   }
 
-    const fetchRecipe = useCallback(async (refinement = "", currentRecipe = null) => {
+  const fetchRecipe = useCallback(async (refinement = "", currentRecipe = null) => {
     if (ingredients.length < 4 && !currentRecipe) return;
     
+    // 1. Abort previous request if it exists
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    
+    // 2. Create new controller for this request
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     if (currentRecipe) setIsRefining(true); else setIsLoading(true);
     setError(null);
     setRecipeShown(true);
 
     try {
-      // The backend handles the parsing and validation now!
-      const parsedRecipe = await getRecipeFromGemini(ingredients, refinement, currentRecipe);
+      // 3. Pass the signal to the fetch function
+      const parsedRecipe = await getRecipeFromGemini(ingredients, refinement, currentRecipe, controller.signal);
       
       if (!parsedRecipe.title || !parsedRecipe.ingredients) {
         throw new Error("The AI returned malformed data. Please try again.");
@@ -70,7 +81,10 @@ export default function Body({ darkMode }) {
 
       setRecipe(parsedRecipe);
     } catch (err) {
-      setError(err.message || "Failed to fetch recipe.");
+      // 4. Don't show error if it was just us aborting the request manually
+      if (err.name !== 'AbortError') {
+        setError(err.message || "Failed to fetch recipe.");
+      }
     } finally {
       setIsLoading(false);
       setIsRefining(false);
@@ -122,7 +136,7 @@ export default function Body({ darkMode }) {
       <IngredientsList
         ingredients={ingredients}
         darkMode={darkMode}
-        isLoading={isLoading} // Pass loading state down
+        isLoading={isLoading}
         resetIngredients={resetIngredients}
         toggleRecipeShown={() => fetchRecipe()}
         deleteIngredient={deleteIngredient}
