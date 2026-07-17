@@ -1,3 +1,4 @@
+// api/_lib/recipeEngine.js
 import { GoogleGenAI } from "@google/genai";
 
 const SYSTEM_PROMPT = `
@@ -34,9 +35,18 @@ Rules:
 - "steps" must be a non-empty array of objects (never a string).
 - Scale ingredient quantities to match the requested servings.
 - Keep it realistic and cookable (you may add basic pantry staples like oil, salt, water).
+- If the user provides a refinement request (e.g., "make it vegan", "scale to 6 servings", "swap butter"), modify the provided recipe JSON accordingly and return the FULL updated JSON.
 `;
 
-function buildUserPrompt(ingredients, servings) {
+function buildUserPrompt(ingredients, servings, refinement, currentRecipe) {
+    // If refinement and currentRecipe exist, we are modifying an existing recipe
+    if (refinement && currentRecipe) {
+        return `Here is the current recipe JSON: ${JSON.stringify(currentRecipe)}.
+Please modify it based on this request: "${refinement}".
+Return the FULL modified JSON only.`;
+    }
+
+    // Otherwise, we are generating a new recipe from scratch
     return `Ingredients available: ${ingredients.join(", ")}.
 Requested servings: ${servings || 2}.
 Return one recipe as JSON only.`;
@@ -88,7 +98,7 @@ function normalizeRecipe(recipe, fallbackServings) {
     };
 }
 
-async function callGemini(ingredients, servings) {
+async function callGemini(ingredients, servings, refinement, currentRecipe) {
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
@@ -101,7 +111,7 @@ async function callGemini(ingredients, servings) {
         model: "gemini-2.5-flash",
         contents: [
             {
-                parts: [{ text: buildUserPrompt(ingredients, servings) }],
+                parts: [{ text: buildUserPrompt(ingredients, servings, refinement, currentRecipe) }],
             },
         ],
         config: {
@@ -115,16 +125,17 @@ async function callGemini(ingredients, servings) {
 
 // Core handler logic, transport-agnostic (used by both Vite dev middleware and Vercel function)
 export async function handleGenerateRecipe(body) {
-    const { ingredients, servings } = body || {};
+    const { ingredients, servings, refinement, currentRecipe } = body || {};
 
-    if (!ingredients || !Array.isArray(ingredients) || ingredients.length === 0) {
+    // Allow request if we have ingredients OR if we are refining an existing recipe
+    if ((!ingredients || !Array.isArray(ingredients) || ingredients.length === 0) && !currentRecipe) {
         return { status: 400, body: { error: "Please add at least one ingredient." } };
     }
 
     let rawResponse;
 
     try {
-        rawResponse = await callGemini(ingredients, servings);
+        rawResponse = await callGemini(ingredients, servings, refinement, currentRecipe);
     } catch (err) {
         console.error("Gemini request failed:", err);
         return { status: 502, body: { error: "AI service is temporarily unavailable. Please try again." } };
@@ -139,7 +150,9 @@ export async function handleGenerateRecipe(body) {
         try {
             const retryRaw = await callGemini(
                 ingredients,
-                servings
+                servings,
+                refinement,
+                currentRecipe
             );
             parsed = JSON.parse(retryRaw);
         } catch (err) {

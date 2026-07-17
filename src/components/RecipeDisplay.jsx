@@ -89,10 +89,14 @@ export default function RecipeDisplay({ recipe, darkMode, onRefine, isRefining, 
                   <span className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors ${checkedIngredients[idx] ? 'bg-orange-500 border-orange-500' : darkMode ? 'border-zinc-600' : 'border-zinc-300'}`}>
                     {checkedIngredients[idx] && <span className="text-white text-[10px]">✓</span>}
                   </span>
-                  <span className={`font-light ${darkMode ? 'text-zinc-200' : 'text-zinc-800'}`}>{ing}</span>
+                  {/* Render rich ingredient object */}
+                  <span className={`font-light ${darkMode ? 'text-zinc-200' : 'text-zinc-800'}`}>
+                    {ing.quantity && <span className="text-orange-500 mr-1">{ing.quantity}</span>}
+                    {ing.name}
+                  </span>
                 </div>
                 <button 
-                  onClick={(e) => { e.stopPropagation(); onRefine(`Swap out ${ing} for a common alternative`, recipe); }}
+                  onClick={(e) => { e.stopPropagation(); onRefine(`Swap out ${ing.name} for a common alternative`, recipe); }}
                   disabled={isRefining}
                   className="text-[10px] px-2 py-1 rounded-full bg-white/5 border border-white/10 text-zinc-400 hover:bg-orange-500 hover:text-white hover:border-orange-500 disabled:opacity-50 transition-colors uppercase tracking-wider"
                 >
@@ -117,8 +121,11 @@ export default function RecipeDisplay({ recipe, darkMode, onRefine, isRefining, 
                 <div className={`flex-shrink-0 w-8 h-8 rounded-full border-2 flex items-center justify-center font-serif text-sm transition-all ${checkedSteps[idx] ? 'bg-green-500 border-green-500 text-white' : darkMode ? 'border-zinc-600 text-zinc-400 group-hover:border-orange-500 group-hover:text-orange-500' : 'border-zinc-300 text-zinc-400 group-hover:border-orange-500 group-hover:text-orange-500'}`}>
                   {checkedSteps[idx] ? '✓' : idx + 1}
                 </div>
-                <div className="pt-1">
-                  <span className={`font-light leading-relaxed ${checkedSteps[idx] ? 'line-through' : ''} ${darkMode ? 'text-zinc-200' : 'text-zinc-800'}`}>{step}</span>
+                <div className="pt-1 flex-1">
+                  {/* Render rich step object */}
+                  {step.title && <span className={`block font-medium text-sm mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>{step.title}</span>}
+                  <span className={`font-light leading-relaxed ${checkedSteps[idx] ? 'line-through' : ''} ${darkMode ? 'text-zinc-200' : 'text-zinc-800'}`}>{step.description || step}</span>
+                  {step.tip && <span className="block text-xs italic text-orange-500/80 mt-2">💡 {step.tip}</span>}
                   {!checkedSteps[idx] && <div className="text-[10px] text-zinc-600 uppercase tracking-wider mt-1 opacity-0 group-hover:opacity-100 transition-opacity">Click to complete</div>}
                 </div>
               </motion.li>

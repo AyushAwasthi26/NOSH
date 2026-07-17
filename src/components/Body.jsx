@@ -53,7 +53,7 @@ export default function Body({ darkMode }) {
     localStorage.removeItem("recipe");
   }
 
-  const fetchRecipe = useCallback(async (refinement = "", currentRecipe = null) => {
+    const fetchRecipe = useCallback(async (refinement = "", currentRecipe = null) => {
     if (ingredients.length < 4 && !currentRecipe) return;
     
     if (currentRecipe) setIsRefining(true); else setIsLoading(true);
@@ -61,13 +61,10 @@ export default function Body({ darkMode }) {
     setRecipeShown(true);
 
     try {
-      const rawText = await getRecipeFromGemini(ingredients, refinement, currentRecipe);
+      // The backend handles the parsing and validation now!
+      const parsedRecipe = await getRecipeFromGemini(ingredients, refinement, currentRecipe);
       
-      let parsedRecipe;
-      try {
-        parsedRecipe = JSON.parse(rawText);
-        if (!parsedRecipe.title || !parsedRecipe.ingredients) throw new Error("Invalid shape");
-      } catch (parseError) {
+      if (!parsedRecipe.title || !parsedRecipe.ingredients) {
         throw new Error("The AI returned malformed data. Please try again.");
       }
 
