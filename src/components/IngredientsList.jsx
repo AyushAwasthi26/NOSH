@@ -1,7 +1,7 @@
 import React from "react";
 import { motion, AnimatePresence } from 'framer-motion';
 
-export default function IngredientsList({ ingredients, resetIngredients, toggleRecipeShown, deleteIngredient }) {
+export default function IngredientsList({ ingredients, darkMode, resetIngredients, toggleRecipeShown, deleteIngredient }) {
   return (
     <section className="mt-12">
       <AnimatePresence>
@@ -11,7 +11,7 @@ export default function IngredientsList({ ingredients, resetIngredients, toggleR
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
           >
-            <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-zinc-500 mb-6 text-center">
+            <h2 className={`text-xs font-medium uppercase tracking-[0.2em] mb-6 text-center ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
               Selected Pantry
             </h2>
             
@@ -25,12 +25,13 @@ export default function IngredientsList({ ingredients, resetIngredients, toggleR
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.8 }}
                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                    className="flex items-center gap-3 pl-5 pr-2 py-2 rounded-full text-sm font-light text-white border border-white/10 bg-white/5 backdrop-blur-md shadow-lg"
+                    // Dynamic Pill Styling
+                    className={`flex items-center gap-3 pl-5 pr-2 py-2 rounded-full text-sm font-light border shadow-sm ${darkMode ? 'bg-white/5 text-white border-white/10' : 'bg-white text-black border-black/10'}`}
                   >
                     {ingredient}
                     <button
                       onClick={() => deleteIngredient(ingredient)}
-                      className="w-6 h-6 rounded-full flex items-center justify-center bg-white/10 text-zinc-400 hover:bg-orange-500 hover:text-white transition-colors text-[10px]"
+                      className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors text-[10px] ${darkMode ? 'bg-white/10 text-zinc-400 hover:bg-orange-500 hover:text-white' : 'bg-black/5 text-zinc-500 hover:bg-orange-500 hover:text-white'}`}
                     >
                       ✕
                     </button>
@@ -40,7 +41,7 @@ export default function IngredientsList({ ingredients, resetIngredients, toggleR
             </div>
             
             <div className="flex justify-center mb-12">
-              <button onClick={resetIngredients} className="text-xs uppercase tracking-widest text-zinc-600 hover:text-orange-500 transition-colors">
+              <button onClick={resetIngredients} className="text-xs uppercase tracking-widest text-zinc-500 hover:text-orange-500 transition-colors">
                 Clear All
               </button>
             </div>
@@ -54,7 +55,9 @@ export default function IngredientsList({ ingredients, resetIngredients, toggleR
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col items-center"
         >
-          <p className="font-serif italic text-zinc-400 mb-6 text-lg">Shall we begin the culinary journey?</p>
+          <p className={`font-serif italic mb-6 text-lg ${darkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
+            Shall we begin the culinary journey?
+          </p>
           <motion.button 
             whileHover={{ scale: 1.02, boxShadow: "0 0 40px rgba(242, 148, 26, 0.4)" }}
             whileTap={{ scale: 0.98 }}
