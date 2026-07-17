@@ -91,12 +91,12 @@ export default function Body({ darkMode }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="font-serif text-4xl md:text-5xl text-white mb-4 tracking-tight"
+          className={`font-serif text-4xl md:text-5xl mb-4 tracking-tight ${darkMode ? 'text-white' : 'text-black'}`}
         >
           What's in your <span className="italic text-orange-500">kitchen</span>?
         </motion.h2>
-        <p className="text-zinc-500 font-light mb-10 max-w-xl mx-auto">
-          List your ingredients below. Let our AI Chef craft a cinematic culinary experience for you.
+        <p className={`font-light mb-10 max-w-xl mx-auto ${darkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>
+          List your ingredients below. Let NOSH craft a cinematic culinary experience for you.
         </p>
 
         <form onSubmit={handleSubmit} className="flex gap-3 max-w-2xl mx-auto">
@@ -105,12 +105,13 @@ export default function Body({ darkMode }) {
             placeholder="e.g. paneer, tomatoes, garlic"
             aria-label="Add ingredient"
             name="ingredient"
-            className="flex-1 px-6 py-4 rounded-full border border-white/10 bg-white/5 backdrop-blur-md text-white placeholder-zinc-600 outline-none focus:border-orange-500/50 transition-all shadow-[0_0_30px_rgba(242,148,26,0.15)] font-light"
+            // Dynamic Input Styling
+            className={`flex-1 px-6 py-4 rounded-full border backdrop-blur-md outline-none focus:border-orange-500/50 transition-all shadow-[0_0_30px_rgba(242,148,26,0.15)] font-light ${darkMode ? 'bg-white/5 border-white/10 text-white placeholder-zinc-600' : 'bg-white/60 border-black/10 text-black placeholder-zinc-400'}`}
           />
           <motion.button 
             type="submit" 
             whileTap={{ scale: 0.95 }}
-            className="px-8 py-4 rounded-full bg-white text-black font-medium hover:bg-orange-500 hover:text-white transition-colors shadow-lg"
+            className="px-8 py-4 rounded-full bg-orange-500 text-white font-medium hover:bg-orange-600 transition-colors shadow-lg shadow-orange-500/20"
           >
             Add
           </motion.button>
@@ -119,6 +120,7 @@ export default function Body({ darkMode }) {
       
       <IngredientsList
         ingredients={ingredients}
+        darkMode={darkMode} // Passed down
         resetIngredients={resetIngredients}
         toggleRecipeShown={() => fetchRecipe()}
         deleteIngredient={deleteIngredient}
@@ -134,13 +136,13 @@ export default function Body({ darkMode }) {
               className="flex flex-col items-center justify-center py-24"
             >
               <div className="w-12 h-12 border-2 border-orange-500 border-t-transparent rounded-full animate-spin mb-6"></div>
-              <p className="text-zinc-500 font-light tracking-widest text-sm uppercase">Crafting your recipe...</p>
+              <p className={`font-light tracking-widest text-sm uppercase ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>Crafting your recipe...</p>
             </motion.div>
           )}
         </AnimatePresence>
         
         {error && (
-          <div className="p-6 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl flex justify-between items-center backdrop-blur-md">
+          <div className="p-6 bg-red-500/10 border border-red-500/30 text-red-500 rounded-xl flex justify-between items-center backdrop-blur-md">
             <span>{error}</span>
             <button onClick={() => fetchRecipe()} className="px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-bold">Retry</button>
           </div>
@@ -149,10 +151,11 @@ export default function Body({ darkMode }) {
         {!isLoading && !error && recipe && (
           <RecipeDisplay 
             recipe={recipe} 
+            darkMode={darkMode} // Passed down
             onRefine={(text, currentRecipe) => fetchRecipe(text, currentRecipe)} 
             isRefining={isRefining}
             onReset={resetIngredients}
-            onRegenerate={() => fetchRecipe()} // Generates a new recipe from same ingredients
+            onRegenerate={() => fetchRecipe()} 
           />
         )}
       </section>
