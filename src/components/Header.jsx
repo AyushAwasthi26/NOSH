@@ -12,35 +12,52 @@ export default function Header({ darkMode, setDarkMode }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          {/* <span className="text-3xl text-orange-500">✦</span> */}
-
-          {/* Replaced the span with your nosh.png image */}
-          <img src="/nosh.png" alt="NOSH Logo" className="w-8 h-8 object-contain" />
-
-          {/* NOSH in Serif with wide tracking for premium look */}
-          <h1 className={`font-serif text-xl tracking-[0.3em] uppercase ${darkMode ? 'text-white' : 'text-black'}`}>
+          <img 
+            src="/nosh.png" 
+            alt="NOSH Logo" 
+            // Smart filter: adds glow in dark mode. 
+            // If your logo is black and disappears in dark mode, change 'invert-0' to 'invert'
+            className={`w-8 h-8 object-contain transition-all duration-500 
+              ${darkMode 
+                ? 'invert-0 drop-shadow-[0_0_10px_rgba(242,148,26,0.6)]' 
+                : 'brightness-0'
+              }`} 
+          />
+          
+          <h1 className={`font-serif text-xl tracking-[0.3em] uppercase transition-colors duration-500 ${darkMode ? 'text-white' : 'text-black'}`}>
             Nosh
           </h1>
         </motion.div>
         
         {/* Dark/Light Toggle Switch */}
         <div className="flex items-center gap-4">
-          <span className={`text-xs uppercase tracking-widest hidden sm:block ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
+          <span className={`text-xs uppercase tracking-widest hidden sm:block transition-colors duration-500 ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
             {darkMode ? 'Cinematic' : 'Light'}
           </span>
-          <button 
+          
+          {/* Added whileTap for a smooth click animation */}
+          <motion.button 
+            whileTap={{ scale: 0.9 }} 
             onClick={() => setDarkMode(!darkMode)}
-            className={`w-14 h-7 rounded-full p-1 flex items-center transition-colors duration-300 ${darkMode ? 'bg-orange-500/20 border border-orange-500/30' : 'bg-black/10 border border-black/10'}`}
+            className={`w-14 h-7 rounded-full p-1 flex items-center transition-colors duration-300 ease-in-out ${darkMode ? 'bg-orange-500/20 border border-orange-500/30' : 'bg-black/10 border border-black/10'}`}
+            aria-label="Toggle dark mode"
           >
             <motion.div 
               className={`w-5 h-5 rounded-full shadow-md flex items-center justify-center text-[10px] ${darkMode ? 'bg-orange-500 ml-auto' : 'bg-white mr-auto'}`}
               layout
               transition={{ type: "spring", stiffness: 500, damping: 30 }}
             >
-              {/* Sun/Moon Icons */}
-              {darkMode ? '🌙' : '☀️'}
+              {/* Animated Icon Swap */}
+              <motion.span
+                key={darkMode ? 'moon' : 'sun'}
+                initial={{ rotate: -90, opacity: 0, scale: 0.5 }}
+                animate={{ rotate: 0, opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+              >
+                {darkMode ? '🌙' : '☀️'}
+              </motion.span>
             </motion.div>
-          </button>
+          </motion.button>
         </div>
       </div>
     </header>
