@@ -263,12 +263,12 @@ In accordance with assignment rules, AI tools were used transparently as pair-pr
 * **Claude, Gemini & Z AI:** Utilized for rapid refactoring of Tailwind utility classes, brainstorming Framer Motion `layout` logic, and consulting on the exact implementation of the `AbortController` hook.
 * *Zero code was blindly copy-pasted; all logic was manually reviewed, integrated, and tailored to fit the specific constraints of the React component tree.*
 
-**Time Allocation (Total: ~9 Hours)**
+**Time Allocation (Total: ~6 Hours)**
 
-* **3.0 hrs:** Core engine (API integration, prompt engineering, strict JSON parsing, Vercel routing).
-* **3.0 hrs:** UI/UX (Tailwind styling, Glass-morphism, Framer Motion animations, Responsive design).
+* **2.0 hrs:** Core engine (API integration, prompt engineering, strict JSON parsing, Vercel routing).
+* **2.0 hrs:** UI/UX (Tailwind styling, Glass-morphism, Framer Motion animations, Responsive design).
 * **1.5 hrs:** Stretch Features (Refinement loop, serving scalers, persistent local storage).
-* **1.5 hrs:** Edge-case handling (AbortController, retry logic) & Documentation (README, Demo recording).
+* **0.5 hrs:** Edge-case handling (AbortController, retry logic) & Documentation (README, Demo recording).
 
 ---
 
