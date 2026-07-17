@@ -12,6 +12,9 @@ export default function Header({ darkMode, setDarkMode }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
+
+          {/* <span className="text-3xl text-orange-500">✦</span> */}
+          
           <img 
             src="/nosh.png" 
             alt="NOSH Logo" 
