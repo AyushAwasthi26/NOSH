@@ -71,13 +71,6 @@ When the reviewer clones this repo, they will not see a `.env` file. But they wi
 <img width="1917" height="1078" alt="Screenshot 2026-07-18 015421" src="https://github.com/user-attachments/assets/89d81cb8-78e8-4b2f-a7cf-5ef37eb1c5f7" />
 
 
-
-**🎥 [Watch the 2-Minute Demo Video Here](#)**
-
-<img width="1920" height="1080" alt="Landing Page - Dark Mode" src="https://github.com/user-attachments/assets/placeholder-1" />
-<img width="1920" height="1080" alt="Recipe Dashboard" src="https://github.com/user-attachments/assets/placeholder-2" />
-<img width="1920" height="1080" alt="Light Mode Toggle" src="https://github.com/user-attachments/assets/placeholder-3" />
-
 ---
 
 ## 🌟 About the Project
